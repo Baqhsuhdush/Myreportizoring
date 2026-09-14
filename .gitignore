@@ -1,0 +1,5 @@
+# Локальные секреты Cloudflare Workers
+backend/.dev.vars
+
+# Результат локальной сборки фронтенда
+frontend/dist/

@@ -1,0 +1,46 @@
+name = "fizika-lab-backend"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# --- База данных (классы, уроки, пользователи, сессии, push-подписки) ---
+[[d1_databases]]
+binding = "DB"
+database_name = "fizika-lab-db"
+database_id = "5ed5f807-50aa-442f-89eb-a0f6142f37e4"
+
+# --- Хранилище фото конспектов ---
+[[r2_buckets]]
+binding = "CONSPECTS_BUCKET"
+bucket_name = "fizika-lab-conspects"
+
+# --- Переменные окружения (VAPID-ключи для push-уведомлений и т.п.) ---
+[vars]
+ENVIRONMENT = "development"
+FRONTEND_ORIGIN = "https://fizika-lab.pages.dev"
+SESSION_SECRET = "fizika-lab-dev-session-secret-change-in-prod"
+VAPID_PUBLIC_KEY = ""
+VAPID_PRIVATE_KEY = ""
+
+# Для установки секретов в продакшене используйте:
+# wrangler secret put VAPID_PRIVATE_KEY
+# wrangler secret put VAPID_PUBLIC_KEY
+# wrangler secret put SESSION_SECRET
+# wrangler secret put TEACHER_EMAIL
+# wrangler secret put TEACHER_PASSWORD
+
+[env.production]
+name = "fizika-lab-backend-prod"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "fizika-lab-db"
+database_id = "5ed5f807-50aa-442f-89eb-a0f6142f37e4"
+
+[[env.production.r2_buckets]]
+binding = "CONSPECTS_BUCKET"
+bucket_name = "fizika-lab-conspects"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+FRONTEND_ORIGIN = "https://fizika-lab.pages.dev"
