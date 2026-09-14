@@ -3,3 +3,7 @@ backend/.dev.vars
 
 # Результат локальной сборки фронтенда
 frontend/dist/
+
+node_modules/
+.wrangler/
+frontend/dist/
