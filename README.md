@@ -1,201 +1,72 @@
 # Myreportizoring
-Fizika Lab ⚛️ — Образовательная платформа по физике
-Fizika Lab — современная серверлесс-платформа для изучения школьной физики (7–11 классы). Ученики смотрят видеоуроки, пишут конспекты в тетрадь, выполняют тесты и задачи, отправляют фото конспектов на проверку учительнице и смотрят видеоразборы.
+Fizika Lab ⚛️ — The Fizika Lab educational platform for physics is a modern serverless platform for studying school physics (grades 7–11). Students watch video lessons, take notes in a notebook, complete tests and tasks, send photos of their notes for the teacher to review, and watch video tutorials.
+The project is built on the modern serverless infrastructure of Cloudflare (Workers, D1, R2, Pages), which guarantees high performance, no costs for server maintenance, and scalability.
 
-Проект построен на современной бессерверной инфраструктуре Cloudflare (Workers, D1, R2, Pages), что гарантирует высокую скорость работы, отсутствие расходов на поддержку серверов и масштабируемость.
+Note: This platform is under development. The information about the lessons has not been updated.
 
-Примечание
-Данная платформа находится в разработке. Информация по урокам не дополнена.
+🚀 Technology stack: Backend: Cloudflare Workers + Hono (TypeScript) Database: Cloudflare D1 (Serverless SQLite) File storage: Cloudflare R2 (storage of photo notes) Frontend: React 18, TypeScript, Vite, React Router v6 Authorization: Secure session cookies (HttpOnly, SameSite, Secure) + Web Crypto PBKDF2-SHA256 Notifications: Web Push API (VAPID) 📋 Structure and logic of lessons according to the technical requirements. Each lesson consists of 5 mandatory components:
 
-🚀 Стек технологий
-Backend: Cloudflare Workers + Hono (TypeScript)
-База данных: Cloudflare D1 (Serverless SQLite)
-Файловое хранилище: Cloudflare R2 (хранение фото конспектов)
-Frontend: React 18, TypeScript, Vite, React Router v6
-Авторизация: Безопасные сессионные Cookie (HttpOnly, SameSite, Secure) + Web Crypto PBKDF2-SHA256
-Уведомления: Web Push API (VAPID)
-📋 Структура и логика уроков по ТЗ
-Каждый урок состоит из 5 обязательных компонентов:
+Video lesson: A video recording from YouTube (supported formats: youtube.com/watch?v=..., youtu.be/..., shorts, embed). Summary: A text instruction specifying what the student should write down in their notebook. Test / Tasks: A link to Google Docs / Google Forms with test questions for self‑assessment. Video analysis of the test: a YouTube video with a detailed explanation of the solutions. Note submission zone: uploading photos of the student’s notebook (up to 10 photos, uploading to Cloudflare R2). 🔒 Progress and lesson blocking system. The first lesson of the first section is open immediately after the student’s registration is approved. Lesson N + 1 is blocked until the student uploads a photo of the note for lesson N and the teacher sets the status to “Success”. The next section is blocked until the teacher accepts the notes for all lessons in the previous section. If the status is “Failure,” the student sees the teacher’s comment and the form for retaking the summary. 📂 Project structure: Physics_Lab/ ├── backend/ # Cloudflare Workers API │ ├── src/ │ │ ├── db/ │ │ │ ├── schema.sql # Database schema for D1 │ │ │ ├── seed.sql # Initial data (classes 7-11, teacher, lessons) │ │ │ └── queries/ # Queries for D1 (users, lessons, conspects, etc.) │ │ ├── middleware/ # Auth and role-based middleware │ │ ├── routes/ # REST API endpoints (auth, classes, sections, lessons, conspects, admin, push) │ │ ├── services/ # Services (progress lock, r2 upload, web push) │ │ ├── utils/ # Password hashing, sessions, validators │ │ └── index.ts # Entry point of the Hono application │ ├── package.json │ ├── tsconfig.json │ └── wrangler.toml # Cloudflare Workers configuration, D1 and R2 │ ├── frontend/ # React Single Page Application (SPA) │ ├── src/ │ │ ├── api/ # API clients for interacting with the backend │ │ ├── components/ # UI components (VideoPlayer, ConspectUploader, layout) │ │ ├── context/ # Authorization context (AuthContext) │ │ ├── hooks/ # Custom hooks (useAuth, usePushNotifications) │ │ ├── pages/ # Application pages │ │ │ ├── admin/ # Teacher's panel (AdminDashboard, StudentRequests, ConspectReview, LessonsManage) │ │ │ ├── auth/ # Login and registration with class selection │ │ │ └── student/ # Student pages (Classes, Sections, LessonsList, LessonPage, ConspectUpload) │ │ ├── styles/ # CSS design system (tokens, layout, auth, global) │ │ ├── App.tsx # Routing and protected routes │ │ └── main.tsx │ ├── package.json │ ├── tsconfig.json │ └── vite.config.ts └── readme.md 🛠️ Local development launch
 
-Видеоурок: Видеозапись с YouTube (поддерживаются форматы youtube.com/watch?v=..., youtu.be/..., shorts, embed).
-Конспект: Текстовая инструкция, что именно ученик должен записать в тетрадь.
-Тест / Задачи: Ссылка на Google Docs / Google Forms с вопросами теста для самопроверки.
-Видеоразбор теста: YouTube-видео с подробным объяснением решений.
-Зона отправки конспекта: Загрузка фотографий тетради ученика (до 10 фото, загрузка в Cloudflare R2).
-🔒 Система прогресса и блокировки уроков
-Первый урок первого раздела открыт сразу после одобрения регистрации ученика.
-Урок 
-N
-+
-1
- заблокирован до тех пор, пока ученик не загрузит фото конспекта по уроку 
-N
- и учительница не поставит статус «Успех».
-Следующий раздел заблокирован, пока учительница не примет конспекты по всем урокам предыдущего раздела.
-При статусе «Провал» ученик видит комментарий учительницы и форму для пересдачи конспекта.
-📂 Структура проекта
-Physics_Lab/
-├── backend/                  # Cloudflare Workers API
-│   ├── src/
-│   │   ├── db/
-│   │   │   ├── schema.sql    # Схема базы данных D1
-│   │   │   ├── seed.sql      # Начальные данные (классы 7-11, учитель, уроки)
-│   │   │   └── queries/      # Запросы к D1 (users, lessons, conspects и т.д.)
-│   │   ├── middleware/       # Auth и Role-based middleware
-│   │   ├── routes/           # REST API эндпоинты (auth, classes, sections, lessons, conspects, admin, push)
-│   │   ├── services/         # Сервисы (progress lock, r2 upload, web push)
-│   │   ├── utils/            # Хэширование паролей, сессии, валидаторы
-│   │   └── index.ts          # Точка входа Hono-приложения
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── wrangler.toml         # Конфигурация Cloudflare Workers, D1 и R2
-│
-├── frontend/                 # React Single Page Application (SPA)
-│   ├── src/
-│   │   ├── api/              # API-клиенты для взаимодействия с бэкендом
-│   │   ├── components/       # UI компоненты (VideoPlayer, ConspectUploader, layout)
-│   │   ├── context/          # Контекст авторизации (AuthContext)
-│   │   ├── hooks/            # Пользовательские хуки (useAuth, usePushNotifications)
-│   │   ├── pages/            # Страницы приложения
-│   │   │   ├── admin/        # Панель учительницы (AdminDashboard, StudentRequests, ConspectReview, LessonsManage)
-│   │   │   ├── auth/         # Вход и регистрация с выбором класса
-│   │   │   └── student/      # Страницы ученика (Classes, Sections, LessonsList, LessonPage, ConspectUpload)
-│   │   ├── styles/           # CSS дизайн-система (tokens, layout, auth, global)
-│   │   ├── App.tsx           # Роутинг и защищённые маршруты
-│   │   └── main.tsx
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── vite.config.ts
-└── readme.md
-🛠️ Локальный запуск для разработки
-1. Предварительные требования
-Установленный Node.js (версия 18 или выше).
-2. Запуск Backend (Cloudflare Workers + D1 локально)
-cd backend
-npm install
-
-# Инициализация локальной базы D1 и загрузка демо-данных
+Prerequisites: Installed Node.js (version 18 or higher).
+Launching Backend (Cloudflare Workers + D1 locally): cd backend npm install
+Initializing local D1 database and loading demo data
 npm run db:init:local
 
-# Создайте backend/.dev.vars из backend/.dev.vars.example и укажите
-# TEACHER_EMAIL и TEACHER_PASSWORD для локального входа
+Create backend/.dev.vars from backend/.dev.vars.example and specify
+TEACHER_EMAIL and TEACHER_PASSWORD for local login
+Launching local API server on port 8787
+npm run dev 3. Launching Frontend (Vite) In a separate terminal window:
+cd frontend npm install
 
-# Запуск локального сервера API на порту 8787
-npm run dev
-3. Запуск Frontend (Vite)
-В отдельном окне терминала:
+Launching frontend on http://localhost:5173
+npm run dev Open in browser: http://localhost:5173.
 
-cd frontend
-npm install
+🔑 Teacher access. The repository does not and should not contain a shared teacher password. The only administrator account is created automatically upon first login from two Cloudflare secrets. Public registration creates only students.
 
-# Запуск фронтенда на http://localhost:5173
-npm run dev
-Откройте в браузере: http://localhost:5173.
-
-🔑 Доступ учительницы
-В репозитории нет и не должно быть общего пароля учительницы. Единственная администраторская учётная запись создаётся автоматически при первом входе из двух секретов Cloudflare. Публичная регистрация создаёт только учеников.
-
-Перед первым входом задайте секреты в папке backend:
+Before the first login, set the secrets in the backend folder:
 
 npx wrangler secret put TEACHER_EMAIL --env production
-# укажите личный email учительницы
+
+Specify the teacher’s personal email address
 npx wrangler secret put TEACHER_PASSWORD --env production
-# задайте уникальный пароль длиной не менее 12 символов
-После production-деплоя войдите на /login с этими email и паролем. При первом входе создастся аккаунт с ролью teacher; все страницы /admin и API админ-панели остаются недоступны ученикам. Смена TEACHER_PASSWORD безопасно сменит пароль учительницы при следующем входе.
 
-☁️ Пошаговое руководство по развертыванию в Cloudflare (Production)
-Шаг 1. Авторизация в Cloudflare CLI
-cd backend
-npx wrangler login
-Шаг 2. Создание базы данных Cloudflare D1
-npx wrangler d1 create fizika-lab-db
-Команда выведет database_id. Скопируйте его.
+Set a unique password with a length of at least 12 characters. After the production deployment, log in to /login using these email and password. On the first login, an account with the teacher role will be created; all pages /admin and the admin panel API remain inaccessible to students. Changing TEACHER_PASSWORD will safely change the teacher’s password on the next login. 
 
-В файле backend/wrangler.toml замените REPLACE_WITH_D1_DATABASE_ID на полученный ID:
+☁️ Step‑by‑step guide to deploying to Cloudflare (Production) Step 1. Authorize in Cloudflare CLI: cd backend npx wrangler login. Step 2. Create a Cloudflare D1 database: npx wrangler d1 create fizika-lab-db. The command will output database_id. Copy it..
 
-[[d1_databases]]
-binding = "DB"
-database_name = "fizika-lab-db"
-database_id = "ВАШ_DATABASE_ID"
+In the backend/wrangler.toml file, replace REPLACE_WITH_D1_DATABASE_ID with the obtained ID:
 
-[[env.production.d1_databases]]
-binding = "DB"
-database_name = "fizika-lab-db"
-database_id = "ВАШ_DATABASE_ID"
-Шаг 3. Применение схемы и начальных данных в Production D1
-# Создание таблиц
+[[d1_databases]] binding = "DB" database_name = "fizika-lab-db" database_id = "YOUR_DATABASE_ID"
+
+[[env.production.d1_databases]] binding = "DB" database_name = "fizika-lab-db" database_id = "YOUR_DATABASE_ID" Step 3. Applying the schema and initial data to Production D1
+
+Creating tables
 npx wrangler d1 execute fizika-lab-db --remote --file=src/db/schema.sql
 
-# Загрузка начальных классов и разделов
-npx wrangler d1 execute fizika-lab-db --remote --file=src/db/seed.sql
-Если база была создана до этого обновления, один раз примените ограничение на единственный аккаунт учительницы. При первом входе старый демонстрационный email и пароль будут заменены значениями из секретов:
+Loading initial classes and sections
+npx wrangler d1 execute fizika-lab-db --remote --file=src/db/seed.sql If the database was created before this update, apply the restriction once to the single teacher’s account. Upon the first login, the old demo email and password will be replaced with values from the secrets:
 
-npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0001_single_teacher.sql
-Чтобы применить защиту от повторной отправки конспекта к уже созданной базе, выполните также:
+npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0001_single_teacher.sql To apply protection against re‑sending a summary to an already created database, also run:
 
-npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0002_one_active_conspect.sql
-Чтобы включить перевод учеников между классами с сохранением доступа к прошлым материалам, примените также:
+npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0002_one_active_conspect.sql To enable transferring students between classes while retaining access to previous materials, also apply:
 
-npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0003_student_class_history.sql
-И ограничение от повторного массового перевода в одном учебном году:
+npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0003_student_class_history.sql And the restriction on repeated mass transfer within one academic year:
 
-npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0004_class_promotion_runs.sql
-Шаг 4. Создание хранилища Cloudflare R2
-npx wrangler r2 bucket create fizika-lab-conspects
-Шаг 5. Настройка секретов Worker
-Задайте секретный ключ сессий в Cloudflare Workers:
-
-npx wrangler secret put SESSION_SECRET --env production
-# Введите случайную длинную строку, например: 64-значный ключ
+npx wrangler d1 execute fizika-lab-db --remote --file=migrations/0004_class_promotion_runs.sql Step 4. Creating a Cloudflare R2 storage bucket: npx wrangler r2 bucket create fizika-lab-conspects Step 5. Configuring Worker secrets. Set the session secret key in Cloudflare Workers: npx wrangler secret put SESSION_SECRET --env production 
+Enter a random long string, for example: a 64‑character key.
 npx wrangler secret put TEACHER_EMAIL --env production
-npx wrangler secret put TEACHER_PASSWORD --env production
-(Опционально для Push-уведомлений):
+npx wrangler secret put TEACHER_PASSWORD --env production (Optional for Push notifications):
 
-npx wrangler secret put VAPID_PUBLIC_KEY --env production
-npx wrangler secret put VAPID_PRIVATE_KEY --env production
-Шаг 6. Деплой Backend (Cloudflare Workers)
-npm run deploy:production
-Cloudflare выведет URL вашего бэкенда, например: https://fizika-lab-backend-prod.<ваш-поддомен>.workers.dev.
+npx wrangler secret put VAPID_PUBLIC_KEY --env production npx wrangler secret put VAPID_PRIVATE_KEY --env production Step 6. Deploy Backend (Cloudflare Workers) npm run deploy:production Cloudflare will output the URL of your backend, for example: https://fizika-lab-backend-prod.<your-subdomain>.workers.dev.
 
-В backend/wrangler.toml укажите URL вашего будущего фронтенда в FRONTEND_ORIGIN (или настройте единый домен).
+In backend/wrangler.toml, specify the URL of your future frontend in FRONTEND_ORIGIN (or configure a single domain).
 
-Шаг 7. Деплой Frontend (Cloudflare Pages)
-cd ../frontend
-npm run build
-npx wrangler pages deploy dist --project-name fizika-lab
-Готово! Ваш сайт будет опубликован на https://fizika-lab.pages.dev (или на вашем собственном домене).
+Step 7. Frontend deployment (Cloudflare Pages) cd ../frontend npm run build npx wrangler pages deploy dist --project-name fizika-lab Done! Your website will be published at https://fizika-lab.pages.dev (or on your own domain).
 
-👩‍🏫 Руководство для учительницы (Администратора)
-Вход в систему:
+👩‍🏫 Guide for the teacher (Administrator) Log in:
 
-Перейдите на страницу входа /login.
-Введите email и пароль, заданные в TEACHER_EMAIL и TEACHER_PASSWORD.
-Система автоматически перенаправит вас в Панель управления (/admin).
-Заявки и доступы учеников (/admin/requests):
-
-Новые ученики регистрируются с указанием имени, фамилии, email и класса.
-Во вкладке хранится история всех заявок: ожидающих, одобренных и отклонённых.
-Нажмите «Открыть доступ» или «Закрыть доступ», чтобы изменить решение в любой момент. При закрытии доступа активные сессии ученика завершаются.
-В карточке ученика можно выбрать другой класс и нажать «Изменить класс». Старый класс останется доступен ученику как пройденный.
-Кнопка «Перевести всех на следующий класс» переводит только учеников с открытым доступом; 11-классники не изменяются.
-Проверка конспектов (/admin/conspects):
-
-Ученики отправляют фото рукописных конспектов из тетради.
-В панели отображается имя ученика, название урока и галерея фотографий.
-Нажмите на любую фотографию, чтобы увеличить её на весь экран для детального чтения.
-Напишите комментарий ученику и нажмите:
-«Принять» (Успех): Ученику автоматически открывается следующий урок по программе.
-«Отклонить» (Провал): Ученик получает замечание и должен исправить/дослать конспект.
-Все работы, включая уже проверенные, доступны в разделе «Архив конспектов» (/admin/conspects/archive). Учительница может удалить там ненужные фото из R2. У принятой работы сохранится отметка о прохождении урока, поэтому доступ ученика к следующим урокам не изменится.
-
-Управление темами и уроками (/admin/classes):
-
-Выберите класс (7, 8, 9, 10 или 11).
-Создавайте новые разделы (темы) или редактируйте существующие.
-Внутри раздела добавляйте уроки:
-Номер параграфа (например, §14).
-Название урока.
-Ссылка на видеоурок с YouTube.
+Go to the login page /login. Enter the email and password specified in TEACHER_EMAIL and TEACHER_PASSWORD. The system will automatically redirect you to the Control Panel.
 Текст требований к конспекту.
 Ссылка на Google Docs с тестом.
 Ссылка на видеоразбор теста с YouTube.
